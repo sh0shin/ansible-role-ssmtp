@@ -1,0 +1,29 @@
+# {{ ssmtp_cfg_file }}
+# {{ ansible_managed }}
+
+{% for opt, val in ssmtp_cfg_defaults.items()                                %}
+{%  if ssmtp_cfg[opt] is defined                                             %}
+{%    set val = ssmtp_cfg[opt]                                               %}
+{%  endif                                                                    %}
+{%  if val is sameas true                                                    %}
+{{ opt }}=yes
+{%  elif val is sameas false                                                 %}
+{{ opt }}=no
+{%  elif val is string or val is number                                      %}
+{{ opt }}={{ val }}
+{%  endif                                                                    %}
+{% endfor                                                                    %}
+{% for opt, val in ssmtp_cfg.items()                                         %}
+{%  if opt not in ssmtp_cfg_defaults                                         %}
+{%    if val is sameas true                                                  %}
+{{ opt }}=yes
+{%    elif val is sameas false                                               %}
+{{ opt }}=no
+{%    elif val is string or val is number                                    %}
+{{ opt }}={{ val }}
+{%    endif                                                                  %}
+{%  endif                                                                    %}
+{% endfor                                                                    %}
+
+# vim: set sw=2 ts=2 et :
+# eof

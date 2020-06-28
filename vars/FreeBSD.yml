@@ -1,0 +1,7 @@
+---
+
+ssmtp_group: "ssmtp"
+ssmtp_cfg_root: "/usr/local/etc/ssmtp"
+
+# vim: set syn=yaml sw=2 ts=2 et colorcolumn=160 :
+# eof

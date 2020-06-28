@@ -1,0 +1,95 @@
+---
+
+# forced os variables
+- name: forced os variables
+  include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - '{{ ansible_distribution }}-{{ ansible_machine | default("none") }}.yml'
+        - '{{ ansible_distribution }}-{{ ansible_distribution_release | default(0) }}.yml'
+        - '{{ ansible_distribution }}-{{ ansible_distribution_version | default(0) }}.yml'
+        - '{{ ansible_distribution }}-{{ ansible_distribution_major_version | default(0) }}.yml'
+        - '{{ ansible_distribution }}.yml'
+        - '{{ ansible_os_family }}.yml'
+        - 'main.yml'
+      paths:
+        - 'vars'
+  when: ssmtp_enabled
+        and ansible_os_family | string in ssmtp_os_family_supported
+  tags: [ ssmtp ]
+
+# packages
+- name: packages (freebsd)
+  pkgng:
+    name: '{{ ssmtp_packages_freebsd | default([]) }}'
+    state: '{{ ssmtp_packages_freebsd_state | default("latest") }}'
+    cached: '{{ ssmtp_packages_freebsd_cached | default(false) }}'
+  when: ssmtp_enabled
+        and ansible_os_family | string in ssmtp_os_family_supported
+        and ansible_os_family == 'FreeBSD'
+  tags: [ ssmtp ]
+
+# mailer config
+- name: mail (freebsd directory)
+  file:
+    dest: '{{ ssmtp_mailer_cfg_file | dirname }}'
+    state: directory
+  when: ssmtp_enabled
+        and ansible_os_family | string in ssmtp_os_family_supported
+        and ansible_os_family == 'FreeBSD'
+  tags: [ ssmtp ]
+
+- name: mailer config (freebsd file)
+  copy:
+    src: "{{ lookup('first_found', params) }}"
+    dest: '{{ ssmtp_mailer_cfg_file }}'
+    mode: '{{ ssmtp_mailer_cfg_file_mode | default(ssmtp_file_mode) }}'
+    owner: '{{ ssmtp_mailer_cfg_file_owner | default(ssmtp_owner) }}'
+    group: '{{ ssmtp_mailer_cfg_file_group | default(ssmtp_group) }}'
+    backup: '{{ ssmtp_mailer_cfg_file_backup | default(ssmtp_backup) }}'
+    validate: '{{ ssmtp_mailer_cfg_file_validate | default(omit) }}'
+  vars:
+    params:
+      files:
+        - 'mailer.conf.{{ inventory_hostname }}'
+        - 'mailer.conf'
+        - 'mailer.conf.in' # role default
+      paths:
+        - 'files'
+  when: ssmtp_enabled
+        and ansible_os_family | string in ssmtp_os_family_supported
+        and ansible_os_family == 'FreeBSD'
+  tags: [ ssmtp ]
+
+# config
+- name: ssmtp config
+  template:
+    dest: '{{ ssmtp_cfg_file }}'
+    src: "{{ lookup('first_found', params) }}"
+    #
+    mode: '{{ ssmtp_cfg_file_mode | default(ssmtp_file_mode) }}'
+    owner: '{{ ssmtp_cfg_file_owner | default(ssmtp_owner) }}'
+    group: '{{ ssmtp_cfg_file_group | default(ssmtp_group) }}'
+    backup: '{{ ssmtp_cfg_file_backup | default(ssmtp_backup) }}'
+    validate: '{{ ssmtp_cfg_file_validate | default(omit) }}'
+  vars:
+    tpl_default: '{{ ssmtp_cfg_file | basename }}'
+    tpl_presence: '{{ ssmtp_cfg_file_template | default(tpl_default) }}'
+    params:
+      files:
+        - '{{ tpl_presence }}.{{ inventory_hostname }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}-{{ ansible_distribution_version | default(0) }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}-{{ ansible_distribution_major_version | default(0) }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_os_family }}.j2'
+        - '{{ tpl_presence }}.j2'
+        - '{{ tpl_presence }}.j2.in' # role default
+      paths:
+        - 'templates'
+  when: ssmtp_enabled
+        and ansible_os_family | string in ssmtp_os_family_supported
+  tags: [ ssmtp ]
+
+# vim: set syn=yaml sw=2 ts=2 et colorcolumn=160 :
+# eof

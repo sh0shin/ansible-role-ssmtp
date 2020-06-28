@@ -1,0 +1,40 @@
+---
+
+# enabled
+ssmtp_enabled: yes
+
+# mode/owner/group/backup defaults
+ssmtp_file_mode: "0440"
+ssmtp_dir_mode: "0755"
+ssmtp_owner: "root"
+ssmtp_group: "root"
+ssmtp_backup: yes
+
+# packages
+ssmtp_packages_freebsd:
+  - mail/ssmtp
+
+# config
+ssmtp_cfg_root: "/etc/ssmtp"
+
+# mailer.conf (FreeBSD)
+ssmtp_mailer_cfg_file: "/usr/local/etc/mail/mailer.conf"
+
+# ssmtp config
+ssmtp_cfg_file: "{{ ssmtp_cfg_root }}/ssmtp.conf"
+ssmtp_cfg: {}
+ssmtp_cfg_defaults:
+  Root: "root@localhost"
+  Hostname: '{{ inventory_hostname }}'
+  RewriteDomain: '{{ inventory_hostname | replace(inventory_hostname_short ~ ".", "") }}'
+  #FromLineOverride: yes
+  UseTLS: yes
+  UseSTARTTLS: yes
+  #TLSCert: ...
+  Mailhub: smtp
+  AuthMethod: LOGIN
+  AuthUser: ansible
+  AuthPass: Ansible123!
+
+# vim: set syn=yaml sw=2 ts=2 et colorcolumn=160 :
+# eof

@@ -1,0 +1,7 @@
+---
+
+ssmtp_os_family_supported:
+  - FreeBSD
+
+# vim: set syn=yaml sw=2 ts=2 et colorcolumn=160 :
+# eof
