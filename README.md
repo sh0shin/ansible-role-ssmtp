@@ -14,7 +14,7 @@ See `defaults/main.yml` for now.
 ```yaml
 - hosts: all
   roles:
-    - { role: sh0shin.ssmtp }
+    - { role: sh0shin.ssmtp, ssmtp_enabled: yes }
 ```
 
 ## License

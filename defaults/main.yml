@@ -1,7 +1,7 @@
 ---
 
 # enabled
-ssmtp_enabled: yes
+ssmtp_enabled: no
 
 # mode/owner/group/backup defaults
 ssmtp_file_mode: "0440"
