@@ -34,6 +34,7 @@
 - name: mail (freebsd directory)
   file:
     dest: '{{ ssmtp_mailer_cfg_file | dirname }}'
+    mode: '{{ ssmtp_dir_mode }}'
     state: directory
   when: ssmtp_enabled
         and ansible_os_family | string in ssmtp_os_family_supported
